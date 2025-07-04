@@ -32,7 +32,8 @@ else:
 
 def _parse_engine_arg(arg_str: str) -> tuple[str, Any]:
     if "=" not in arg_str:
-        raise argparse.ArgumentTypeError("engine-arg must be in key=value format")
+        raise argparse.ArgumentTypeError(
+            "engine-arg must be in key=value format")
 
     key, value = arg_str.split("=", 1)
     try:
@@ -52,12 +53,23 @@ def _parse_engine_args(arg_list: list[str]) -> dict[str, Any]:
     return result
 
 
+def _comma_seperated_list_arg(arg):
+
+    item: str = "test , test"
+
+    item.strip()
+
+    return
+
+
 def main() -> None:
-    generators = {ep.name: ep for ep in entry_points(group="sqlacodegen.generators")}
+    generators = {ep.name: ep for ep in entry_points(
+        group="sqlacodegen.generators")}
     parser = argparse.ArgumentParser(
         description="Generates SQLAlchemy model code from an existing database."
     )
-    parser.add_argument("url", nargs="?", help="SQLAlchemy url to the database")
+    parser.add_argument(
+        "url", nargs="?", help="SQLAlchemy url to the database")
     parser.add_argument(
         "--options", help="options (comma-delimited) passed to the generator class"
     )
@@ -92,7 +104,8 @@ def main() -> None:
             "(values are parsed with ast.literal_eval)"
         ),
     )
-    parser.add_argument("--outfile", help="file to write output to (default: stdout)")
+    parser.add_argument(
+        "--outfile", help="file to write output to (default: stdout)")
     args = parser.parse_args()
 
     if args.version:
@@ -118,7 +131,8 @@ def main() -> None:
     engine = create_engine(args.url, **engine_args)
     metadata = MetaData()
     tables = args.tables.split(",") if args.tables else None
-    schemas = args.schemas.split(",") if args.schemas else [None]
+    schemas = [schema.strip() for schema in args.schemas.split(",")
+               ] if args.schemas else [None]
     options = set(args.options.split(",")) if args.options else set()
 
     # Instantiate the generator
